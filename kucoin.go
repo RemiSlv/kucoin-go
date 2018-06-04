@@ -103,6 +103,9 @@ func (b *Kucoin) GetSymbols() (symbols []Symbol, err error) {
 	var rawRes rawSymbols
 	err = json.Unmarshal(r, &rawRes)
 	symbols = rawRes.Data
+	for i := range symbols {
+		symbols[i].APITimestamp = rawRes.Timestamp
+	}
 	return
 }
 
@@ -349,6 +352,9 @@ func (b *Kucoin) CreateOrder(symbol, side string, price, amount float64) (orderO
 	var rawRes rawOrder
 	err = json.Unmarshal(r, &rawRes)
 	orderOid = rawRes.Data.OrderOid
+	if !rawRes.Success {
+		err = errors.New(rawRes.Msg)
+	}
 	return
 }
 

@@ -20,6 +20,7 @@ type Symbol struct {
 	ChangeRate    float64 `json:"changeRate,omitempty"`
 	Stick         bool    `json:"stick,omitempty"`
 	Fav           bool    `json:"fav,omitempty"`
+	APITimestamp  int64
 }
 
 type rawSymbols struct {
