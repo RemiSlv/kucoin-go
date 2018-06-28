@@ -1,5 +1,10 @@
 package kucoin
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 // SpecificDealtOrder struct represents kucoin data model.
 type SpecificDealtOrder struct {
 	Datas []struct {
@@ -28,6 +33,41 @@ type rawSpecificDealtOrder struct {
 	Code    string             `json:"code"`
 	Msg     string             `json:"msg"`
 	Data    SpecificDealtOrder `json:"data"`
+}
+
+// DealtOrder struct represents kucoin data model.
+type DealtOrder struct {
+	Timestamp int64
+	Side      string
+	DealPrice float64
+	DealQty   float64
+	DealValue float64
+}
+
+//DealtOrders ...
+type DealtOrders []DealtOrder
+
+//UnmarshalJSON method for DealtOrder format
+func (tp *DealtOrder) UnmarshalJSON(data []byte) error {
+	var v []interface{}
+	if err := json.Unmarshal(data, &v); err != nil {
+		fmt.Printf("Error whilde decoding %v\n", err)
+		return err
+	}
+	tp.Timestamp = int64(v[0].(float64))
+	tp.Side = string(v[1].(string))
+	tp.DealPrice = float64(v[2].(float64))
+	tp.DealQty = float64(v[3].(float64))
+	tp.DealValue = float64(v[4].(float64))
+	return nil
+}
+
+type rawDealtOrder struct {
+	Success   bool         `json:"success"`
+	Code      string       `json:"code"`
+	Msg       string       `json:"msg"`
+	Timestamp int64        `json:"timestamp"`
+	Data      []DealtOrder `json:"data"`
 }
 
 // MergedDealtOrder struct represents kucoin data model.

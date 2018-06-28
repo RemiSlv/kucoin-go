@@ -399,6 +399,39 @@ func (b *Kucoin) AccountHistory(coin, side, status string, limit, page int) (acc
 	return
 }
 
+//ListDealtOrders is used to get the latest orders in the market for a specific symbol
+func (b *Kucoin) ListDealtOrders(symbol string, side string, limit int) (dealtOrders DealtOrders, err error) {
+	if len(symbol) < 1 {
+		return dealtOrders, fmt.Errorf("Symbol needs to be specified")
+	}
+	payload := map[string]string{}
+	payload["symbol"] = symbol
+	if side != "" {
+		payload["type"] = side
+	}
+	if limit == 0 {
+		payload["limit"] = fmt.Sprintf("%v", 100)
+	} else {
+		payload["limit"] = fmt.Sprintf("%v", limit)
+	}
+
+	r, err := b.client.do("GET", "open/deal-orders", payload, true)
+	if err != nil {
+		return
+	}
+	var response interface{}
+	if err = json.Unmarshal(r, &response); err != nil {
+		return
+	}
+	if err = handleErr(response); err != nil {
+		return
+	}
+	var rawRes rawDealtOrder
+	err = json.Unmarshal(r, &rawRes)
+	dealtOrders = rawRes.Data
+	return
+}
+
 // ListSpecificDealtOrders is used to get the information about dealt orders for specific symbol at Kucoin along with other meta data.
 // Symbol, Side (type in Kucoin docs.) are required parameters. Limit and page may be zeros.
 // Example:
